@@ -107,7 +107,7 @@ class TransformerBlock2D(nn.Module):
         normed = self.norm1(x_flat)  # (B, S, C)
 
         # self-attention (Q=K=V=normed)
-        self_attn_out, self_attn_w = self.self_attn(normed, normed, normed, need_weights=True)
+        self_attn_out, self_attn_w = self.self_attn(normed, normed, normed, need_weights=return_attn)
         self_attn_out = self.attn_dropout(self_attn_out)
         x_res = x_flat + self_attn_out  # residual after self-attn
 
@@ -129,7 +129,7 @@ class TransformerBlock2D(nn.Module):
                 raise ValueError("memory must be 4D tensor (B,C,H,W)")
             # use normed as query, mem_flat as key/value
             query = self.norm1(x_res)  # using same norm (or separate norm could be used)
-            cross_out, cross_attn_w = self.cross_attn(query, mem_flat, mem_flat, need_weights=True)
+            cross_out, cross_attn_w = self.cross_attn(query, mem_flat, mem_flat, need_weights=return_attn)
             cross_out = self.attn_dropout(cross_out)
             x_res = x_res + cross_out  # residual for cross-attn
 
@@ -193,10 +193,13 @@ class ConvNeXtBackboneNet(nn.Module):
         transformer_use_pos: bool = True,
         transformer_use_cross_attn: bool = False,
         use_attention: bool = False,
+        attention_kernel_size: int = 7,
+        return_aux_features: bool = False,
     ):
         """
         variant: timm convnext variant name
         rot_concat: if True, forward returns tuple (x_high, x_f64, x_f32, x_f16)
+        return_aux_features: if True, return auxiliary ConvNeXt features even when rot_concat is False
         use_transformer: apply TransformerBlock2D on top feature (x_high)
         transformer_use_cross_attn: if True, TransformerBlock2D will expect memory to be provided (we pass x_f32 as memory)
         use_attention: whether to use ECA on x_high
@@ -204,6 +207,7 @@ class ConvNeXtBackboneNet(nn.Module):
         super().__init__()
         self.freeze = freeze
         self.rot_concat = rot_concat
+        self.return_aux_features = return_aux_features
 
         # build backbone
         self.backbone = timm.create_model(
@@ -213,10 +217,17 @@ class ConvNeXtBackboneNet(nn.Module):
             features_only=True,
             out_indices=(0, 1, 2, 3),
         )
+        feature_info = (
+            self.backbone.feature_info.get_dicts()
+            if hasattr(self.backbone.feature_info, "get_dicts")
+            else list(self.backbone.feature_info)
+        )
         # features_only returns list of feature maps: low->high
         # Here we expect feats = [x_f64, x_f32, x_f16, x_high] but confirm with timm model
         # Use last feature channels as out_channels
-        self.out_channels = self.backbone.feature_info[-1]["num_chs"]
+        self.out_channels = feature_info[-1]["num_chs"]
+        self.feature_channels = [info["num_chs"] for info in feature_info]
+        self.aux_channels = self.feature_channels[:-1]
 
         # transformer block (applied to x_high)
         self.use_transformer = use_transformer
@@ -234,12 +245,12 @@ class ConvNeXtBackboneNet(nn.Module):
 
         # attention (ECA)
         self.use_attention = use_attention
-        self.eca = ECALayer(self.out_channels) if self.use_attention else None
+        self.eca = ECALayer(self.out_channels, k_size=attention_kernel_size) if self.use_attention else None
 
     def forward(self, x: torch.Tensor):
         """
         Return:
-        - if rot_concat: (x_high, x_f64, x_f32, x_f16) (matching your previous API order)
+        - if rot_concat or return_aux_features: (x_high, x_f64, x_f32, x_f16)
         - else: x_high
         Notes:
         - if transformer.use_cross_attn True, we pass x_f32 as memory to transformer_block
@@ -278,11 +289,11 @@ class ConvNeXtBackboneNet(nn.Module):
         # freeze logic: return detached tensors to prevent gradients if freeze True
         if self.freeze:
             with torch.no_grad():
-                if self.rot_concat:
+                if self.rot_concat or self.return_aux_features:
                     return x_high.detach(), x_f64.detach() if x_f64 is not None else None, x_f32.detach() if x_f32 is not None else None, x_f16.detach() if x_f16 is not None else None
                 return x_high.detach()
         else:
-            if self.rot_concat:
+            if self.rot_concat or self.return_aux_features:
                 return x_high, x_f64, x_f32, x_f16
             return x_high
 

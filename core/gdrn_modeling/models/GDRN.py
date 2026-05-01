@@ -120,9 +120,14 @@ class GDRN(nn.Module):
             # joints.shape [bs, 1152, 64, 64]
             mask, coor_x, coor_y, coor_z, region = self.rot_head_net(features, x_f64, x_f32, x_f16)
         else:
-            features = self.backbone(x)  # features.shape [bs, 2048, 8, 8]
+            backbone_out = self.backbone(x)  # features.shape [bs, 2048, 8, 8]
             # joints.shape [bs, 1152, 64, 64]
-            mask, coor_x, coor_y, coor_z, region = self.rot_head_net(features)
+            if isinstance(backbone_out, tuple):
+                features, x_f64, x_f32, x_f16 = backbone_out
+                mask, coor_x, coor_y, coor_z, region = self.rot_head_net(features, x_f64, x_f32, x_f16)
+            else:
+                features = backbone_out
+                mask, coor_x, coor_y, coor_z, region = self.rot_head_net(features)
 
         # TODO: remove this trans_head_net
         # trans = self.trans_head_net(features)
@@ -566,14 +571,13 @@ def build_model_optimizer(cfg):
             self.rot_concat = rot_concat
 
         def forward(self, x):
-            if self.rot_concat:
-                x_high, x_f64, x_f32, x_f16 = self.backbone(x)
+            outputs = self.backbone(x)
+            if isinstance(outputs, tuple):
+                x_high, x_f64, x_f32, x_f16 = outputs
                 x_high = self.reduce(x_high)
                 return x_high, x_f64, x_f32, x_f16
-            else:
-                x_high = self.backbone(x)
-                x_high = self.reduce(x_high)
-                return x_high
+            x_high = self.reduce(outputs)
+            return x_high
 
     # --------------------------
     # Backbone selection
@@ -589,10 +593,12 @@ def build_model_optimizer(cfg):
             rot_concat=r_head_cfg.ROT_CONCAT,
         )
         last_channels = channels[-1]
+        memory_channels = channels[:-1] if r_head_cfg.ROT_CONCAT else []
     elif "convnext" in backbone_cfg.ARCH:
         # New ConvNeXt branch -------------------------
         variant = getattr(backbone_cfg, "VARIANT", "convnext_tiny")
         transformer_feedforward_dim = backbone_cfg.get("TRANSFORMER_FEEDFORWARD_DIM", 2048)
+        return_aux_features = bool(r_head_cfg.get("USE_HTD", False))
 
         backbone_net = ConvNeXtBackboneNet(
             variant=variant,
@@ -603,9 +609,14 @@ def build_model_optimizer(cfg):
             use_transformer=backbone_cfg.get("USE_TRANSFORMER", False),
             transformer_heads=backbone_cfg.get("TRANSFORMER_NUM_HEADS", 4),
             transformer_feedforward_dim=transformer_feedforward_dim,  # 直接传宽度
+            transformer_dropout=backbone_cfg.get("TRANSFORMER_DROPOUT", 0.0),
+            transformer_attn_dropout=backbone_cfg.get("TRANSFORMER_ATTENTION_DROPOUT", 0.0),
             use_attention=backbone_cfg.get("USE_ATTENTION", False),
+            attention_kernel_size=backbone_cfg.get("ATTENTION_KERNEL_SIZE", 7),
+            return_aux_features=return_aux_features,
         )
         last_channels = backbone_net.out_channels  # e.g., 768 for tiny
+        memory_channels = getattr(backbone_net, "aux_channels", [])
     else:
         raise ValueError(f"Unknown BACKBONE.ARCH: {backbone_cfg.ARCH}")
 
@@ -654,6 +665,7 @@ def build_model_optimizer(cfg):
         region_class_aware=r_head_cfg.REGION_CLASS_AWARE,
         norm=r_head_cfg.NORM,
         num_gn_groups=r_head_cfg.NUM_GN_GROUPS,
+        memory_channels=memory_channels,
     )
     if r_head_cfg.FREEZE:
         for p in rot_head_net.parameters():
