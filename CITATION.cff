@@ -1,0 +1,33 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite the related manuscript and archived repository."
+title: "TR-GDRN: Robust Monocular 6D Object Pose Estimation with ConvNeXt and Hybrid Attention"
+authors:
+  - family-names: "Ji"
+    given-names: "Xiaosheng"
+  - family-names: "Xu"
+    given-names: "Zhen"
+  - family-names: "Zhang"
+    given-names: "Chunyan"
+  - family-names: "Chen"
+    given-names: "Yibo"
+doi: "10.5281/zenodo.19952929"
+url: "https://github.com/jxs0123/TR-GDRN"
+repository-code: "https://github.com/jxs0123/TR-GDRN"
+license: "Apache-2.0"
+date-released: "2026-05-01"
+version: "1.0.0"
+preferred-citation:
+  type: article
+  title: "Robust Monocular 6D Object Pose Estimation with ConvNeXt and Hybrid Attention for Occlusion-Prone Scenes"
+  authors:
+    - family-names: "Ji"
+      given-names: "Xiaosheng"
+    - family-names: "Xu"
+      given-names: "Zhen"
+    - family-names: "Zhang"
+      given-names: "Chunyan"
+    - family-names: "Chen"
+      given-names: "Yibo"
+  journal: "The Visual Computer"
+  year: 2026
+  notes: "Manuscript submitted"

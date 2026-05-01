@@ -1,5 +1,7 @@
 # TR-GDRN
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.19952929.svg)](https://doi.org/10.5281/zenodo.19952929)
+
 Official implementation and reproducibility material for the manuscript:
 
 **Robust Monocular 6D Object Pose Estimation with ConvNeXt and Hybrid Attention for Occlusion-Prone Scenes**
@@ -7,6 +9,8 @@ Official implementation and reproducibility material for the manuscript:
 The manuscript is submitted to *The Visual Computer*. This repository is directly related to that submission and is intended to help readers reproduce the reported experiments on LINEMOD, LM-O, and YCB-V. If you use this code or the released checkpoints, please cite the manuscript listed in the [Citation](#citation) section.
 
 Public repository: https://github.com/jxs0123/TR-GDRN
+
+Zenodo archive: https://doi.org/10.5281/zenodo.19952929
 
 ## Overview
 
@@ -183,7 +187,9 @@ The public GitHub repository is the primary code location for resubmission:
 
 https://github.com/jxs0123/TR-GDRN
 
-A Zenodo DOI will be added after archival of the public GitHub release.
+The archived Zenodo record is available at:
+
+https://doi.org/10.5281/zenodo.19952929
 
 ## Citation
 
