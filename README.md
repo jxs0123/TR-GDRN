@@ -15,7 +15,7 @@ Zenodo archive: https://doi.org/10.5281/zenodo.19952929
 ## Overview
 
 <p align="center">
-<img src="assets/gdrn_architecture.png" width="800">
+<img src="assets/TR-GDRN_architecture.png" width="800">
 </p>
 
 TR-GDRN is a transformer-enhanced geometry-guided direct regression network for monocular RGB-based 6D object pose estimation. It follows the GDR-Net pipeline and improves the feature extraction and pose regression stages with:
