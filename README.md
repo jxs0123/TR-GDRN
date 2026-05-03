@@ -135,39 +135,39 @@ The manuscript reports ADD(-S) for LINEMOD and LM-O, and AUC of ADD-S / ADD(-S) 
 Evaluate LINEMOD:
 
 ```bash
-./core/gdrn_modeling/test_gdrn.sh configs/gdrn/lm/a6_cPnP_lm13.py 0 checkpoints/tr_gdrn_lm13.pth
+./core/gdrn_modeling/test_gdrn.sh configs/gdrn/lm/a6_cPnP_lm13.py 0 checkpoints/LM_model_final.pth
 ```
 
 Evaluate LM-O:
 
 ```bash
-./core/gdrn_modeling/test_gdrn.sh configs/gdrn/lmo/a6_cPnP_AugAAETrunc_BG0.5_lmo_real_pbr0.1_40e.py 0 checkpoints/tr_gdrn_lmo.pth
+./core/gdrn_modeling/test_gdrn.sh configs/gdrn/lmo/a6_cPnP_AugAAETrunc_BG0.5_lmo_real_pbr0.1_40e.py 0 checkpoints/LM-O_model_final.pth
 ```
 
 Evaluate YCB-V:
 
 ```bash
-./core/gdrn_modeling/test_gdrn.sh configs/gdrn/ycbv/a6_cPnP_AugAAETrunc_BG0.5_Rsym_ycbv_real_pbr_visib20_10e.py 0 checkpoints/tr_gdrn_ycbv.pth
+./core/gdrn_modeling/test_gdrn.sh configs/gdrn/ycbv/a6_cPnP_AugAAETrunc_BG0.5_Rsym_ycbv_real_pbr_visib20_10e.py 0 checkpoints/YCB-V_model_final.pth
 ```
 
 Outputs are written under the `output/gdrn/` directory specified by each config.
 
 ## Checkpoints
 
-The reproducibility release is prepared as GitHub Release `v1.0.0`:
+The reproducibility release is archived on Zenodo:
 
-https://github.com/jxs0123/TR-GDRN/releases/tag/v1.0.0
+https://doi.org/10.5281/zenodo.20003076
 
-The release package is expected to contain:
+The archive contains the source code and the following trained checkpoint files:
 
 ```text
 checkpoints/
-|-- tr_gdrn_lm13.pth
-|-- tr_gdrn_lmo.pth
-`-- tr_gdrn_ycbv.pth
+|-- LM_model_final.pth
+|-- LM-O_model_final.pth
+`-- YCB-V_model_final.pth
 ```
 
-Place the downloaded `checkpoints/` directory at the repository root before running the evaluation commands above. If the release artifacts are unavailable, the same checkpoints can be regenerated with the training commands in this README.
+Place the downloaded checkpoint files under a `checkpoints/` directory at the repository root before running the evaluation commands above. If the release artifacts are unavailable, the same checkpoints can be regenerated with the training commands in this README.
 
 ## Key Implementation Files
 
