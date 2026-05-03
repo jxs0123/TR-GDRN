@@ -1,6 +1,6 @@
 # TR-GDRN
 
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.19952929.svg)](https://doi.org/10.5281/zenodo.19952929)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.20003076.svg)](https://doi.org/10.5281/zenodo.20003076)
 
 Official implementation and reproducibility material for the manuscript:
 
@@ -10,7 +10,7 @@ The manuscript is submitted to *The Visual Computer*. This repository is directl
 
 Public repository: https://github.com/jxs0123/TR-GDRN
 
-Zenodo archive: https://doi.org/10.5281/zenodo.19952929
+Zenodo archive: https://doi.org/10.5281/zenodo.20003076
 
 ## Overview
 
@@ -189,7 +189,7 @@ https://github.com/jxs0123/TR-GDRN
 
 The archived Zenodo record is available at:
 
-https://doi.org/10.5281/zenodo.19952929
+https://doi.org/10.5281/zenodo.20003076
 
 ## Citation
 
