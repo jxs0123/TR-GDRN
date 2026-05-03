@@ -14,8 +14,8 @@ doi: "10.5281/zenodo.19952929"
 url: "https://github.com/jxs0123/TR-GDRN"
 repository-code: "https://github.com/jxs0123/TR-GDRN"
 license: "Apache-2.0"
-date-released: "2026-05-01"
-version: "1.0.0"
+date-released: "2026-05-03"
+version: "1.0.1"
 preferred-citation:
   type: article
   title: "Robust Monocular 6D Object Pose Estimation with ConvNeXt and Hybrid Attention for Occlusion-Prone Scenes"
